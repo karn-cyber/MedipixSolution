@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CheckIcon, DownloadIcon } from "@/components/icons";
 
 type BIPEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
 
@@ -35,8 +36,8 @@ export default function InstallButton() {
 
   if (installed) {
     return (
-      <p className="rounded-xl bg-brand-50 px-4 py-3 text-center text-sm font-medium text-brand-800">
-        ✓ Installed — open Medipix from your home screen.
+      <p className="flex items-center justify-center gap-2 rounded-xl bg-brand-50 px-4 py-3 text-center text-sm font-medium text-brand-800">
+        <CheckIcon size={16} /> Installed — open Medipix from your home screen.
       </p>
     );
   }
@@ -57,9 +58,7 @@ export default function InstallButton() {
         onClick={install}
         className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-700 px-5 py-4 text-base font-semibold text-white shadow-lg shadow-brand-700/20 active:scale-[0.99]"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <DownloadIcon size={20} />
         Download Medipix
       </button>
 

@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { dbConnect } from "@/lib/db";
 import { Invoice, User } from "@/lib/models";
 import CommentForm from "@/components/CommentForm";
+import { ArrowLeftIcon } from "@/components/icons";
 
 export default async function InvoiceDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -25,7 +26,9 @@ export default async function InvoiceDetail({ params }: { params: Promise<{ id: 
 
   return (
     <div className="space-y-5">
-      <Link href="/invoices" className="text-sm font-medium text-brand-700">← Invoices</Link>
+      <Link href="/invoices" className="inline-flex items-center gap-1 text-sm font-medium text-brand-700">
+        <ArrowLeftIcon size={16} /> Invoices
+      </Link>
 
       <div className="overflow-hidden rounded-2xl ring-1 ring-slate-200">
         <img

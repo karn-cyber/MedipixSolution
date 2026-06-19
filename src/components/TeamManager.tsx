@@ -24,7 +24,7 @@ export default function TeamManager({
       const res = await addTeamMember(formData);
       if (!res.ok) setError(res.error ?? "Failed");
       else {
-        setNotice("Member added and notified ✓");
+        setNotice("Member added and notified.");
         formRef.current?.reset();
       }
     });

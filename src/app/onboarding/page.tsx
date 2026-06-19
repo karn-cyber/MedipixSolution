@@ -11,7 +11,7 @@ export default async function Onboarding() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col px-6 py-10">
       <img src="/icons/icon-192.png" alt="Medipix" className="h-12 w-12 rounded-2xl" />
-      <h1 className="mt-5 text-2xl font-bold text-slate-900">Welcome to Medipix 👋</h1>
+      <h1 className="mt-5 text-2xl font-bold text-slate-900">Welcome to Medipix</h1>
       <p className="mt-1 text-slate-500">Tell us who you are to finish setting up your account.</p>
 
       <form action={completeOnboarding} className="mt-8 space-y-6">

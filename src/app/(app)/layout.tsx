@@ -16,12 +16,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const unread = await Notification.countDocuments({ userId: me._id, read: false });
 
   const items = [
-    { href: "/dashboard", label: "Home", icon: "🏠" },
-    { href: "/invoices", label: "Invoices", icon: "🧾" },
-    { href: "/invoices/new", label: "Upload", icon: "➕" },
-    ...(isManager(me.role) ? [{ href: "/team", label: "Team", icon: "👥" }] : []),
-    ...(isAdmin(me.role) ? [{ href: "/admin", label: "Admin", icon: "🛡️" }] : []),
-    { href: "/notifications", label: "Alerts", icon: "🔔" },
+    { href: "/dashboard", label: "Home", key: "home" as const },
+    { href: "/invoices", label: "Invoices", key: "invoices" as const },
+    { href: "/invoices/new", label: "Upload", key: "upload" as const },
+    ...(isManager(me.role) ? [{ href: "/team", label: "Team", key: "team" as const }] : []),
+    ...(isAdmin(me.role) ? [{ href: "/admin", label: "Admin", key: "admin" as const }] : []),
+    { href: "/notifications", label: "Alerts", key: "alerts" as const },
   ];
 
   return (

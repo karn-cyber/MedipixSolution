@@ -4,6 +4,7 @@ import { dbConnect } from "@/lib/db";
 import { Invoice } from "@/lib/models";
 import { visibleUploaderIds } from "@/lib/visibility";
 import { isManager } from "@/lib/roles";
+import { PlusIcon, CommentIcon } from "@/components/icons";
 
 export default async function InvoicesPage() {
   const me = await requireUser();
@@ -17,8 +18,8 @@ export default async function InvoicesPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-slate-900">Invoices</h1>
-        <Link href="/invoices/new" className="rounded-full bg-brand-700 px-4 py-2 text-sm font-semibold text-white">
-          ➕ Upload
+        <Link href="/invoices/new" className="flex items-center gap-1.5 rounded-full bg-brand-700 px-4 py-2 text-sm font-semibold text-white">
+          <PlusIcon size={16} /> Upload
         </Link>
       </div>
       <p className="text-sm text-slate-500">
@@ -60,8 +61,8 @@ export default async function InvoicesPage() {
                       Total {inv.totalCount}
                     </span>
                     {inv.comments.length > 0 && (
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-                        💬 {inv.comments.length}
+                      <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                        <CommentIcon size={12} /> {inv.comments.length}
                       </span>
                     )}
                   </div>

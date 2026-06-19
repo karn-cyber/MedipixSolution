@@ -4,6 +4,7 @@ import { dbConnect } from "@/lib/db";
 import { Invoice, User } from "@/lib/models";
 import { visibleUploaderIds } from "@/lib/visibility";
 import { isManager, isAdmin, ROLE_LABELS } from "@/lib/roles";
+import { PlusCircleIcon, ReceiptIcon, UsersIcon, ShieldIcon } from "@/components/icons";
 
 export default async function Dashboard() {
   const me = await requireUser();
@@ -34,7 +35,7 @@ export default async function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Hi, {me.name?.split(" ")[0] ?? "there"} 👋</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Hi, {me.name?.split(" ")[0] ?? "there"}</h1>
         <p className="text-sm text-slate-500">{me.role ? ROLE_LABELS[me.role] : ""}</p>
       </div>
 
@@ -48,20 +49,20 @@ export default async function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <Link href="/invoices/new" className="rounded-2xl bg-brand-700 p-4 font-semibold text-white shadow-lg shadow-brand-700/20">
-          ➕ Upload invoice
+        <Link href="/invoices/new" className="flex items-center gap-2 rounded-2xl bg-brand-700 p-4 font-semibold text-white shadow-lg shadow-brand-700/20">
+          <PlusCircleIcon size={20} /> Upload invoice
         </Link>
-        <Link href="/invoices" className="rounded-2xl bg-white p-4 font-semibold text-slate-800 ring-1 ring-slate-200">
-          🧾 View invoices
+        <Link href="/invoices" className="flex items-center gap-2 rounded-2xl bg-white p-4 font-semibold text-slate-800 ring-1 ring-slate-200">
+          <ReceiptIcon size={20} className="text-brand-700" /> View invoices
         </Link>
         {isManager(me.role) && (
-          <Link href="/team" className="rounded-2xl bg-white p-4 font-semibold text-slate-800 ring-1 ring-slate-200">
-            👥 Manage team
+          <Link href="/team" className="flex items-center gap-2 rounded-2xl bg-white p-4 font-semibold text-slate-800 ring-1 ring-slate-200">
+            <UsersIcon size={20} className="text-brand-700" /> Manage team
           </Link>
         )}
         {isAdmin(me.role) && (
-          <Link href="/admin" className="rounded-2xl bg-white p-4 font-semibold text-slate-800 ring-1 ring-slate-200">
-            🛡️ Admin view
+          <Link href="/admin" className="flex items-center gap-2 rounded-2xl bg-white p-4 font-semibold text-slate-800 ring-1 ring-slate-200">
+            <ShieldIcon size={20} className="text-brand-700" /> Admin view
           </Link>
         )}
       </div>

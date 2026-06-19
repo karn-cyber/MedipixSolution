@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { dbConnect } from "@/lib/db";
 import { Invoice, User } from "@/lib/models";
 import { isAdmin, ROLE_LABELS, type Role } from "@/lib/roles";
+import { ShieldIcon } from "@/components/icons";
 
 export default async function AdminPage() {
   const me = await requireUser();
@@ -35,7 +36,9 @@ export default async function AdminPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-slate-900">🛡️ Admin</h1>
+        <h1 className="flex items-center gap-2 text-xl font-bold text-slate-900">
+          <ShieldIcon size={22} className="text-brand-700" /> Admin
+        </h1>
         <p className="text-sm text-slate-500">Full visibility across Medipix.</p>
       </div>
 

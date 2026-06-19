@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth";
 import { dbConnect } from "@/lib/db";
 import { Notification } from "@/lib/models";
 import { markAllNotificationsRead } from "@/app/actions";
+import { CheckIcon } from "@/components/icons";
 
 export default async function NotificationsPage() {
   const me = await requireUser();
@@ -22,9 +23,10 @@ export default async function NotificationsPage() {
       </div>
 
       {notifs.length === 0 ? (
-        <p className="rounded-2xl bg-white p-8 text-center text-sm text-slate-400 ring-1 ring-slate-100">
-          You&apos;re all caught up 🎉
-        </p>
+        <div className="flex flex-col items-center gap-2 rounded-2xl bg-white p-8 text-center text-sm text-slate-400 ring-1 ring-slate-100">
+          <CheckIcon size={28} className="text-brand-600" />
+          You&apos;re all caught up
+        </div>
       ) : (
         <ul className="space-y-2">
           {notifs.map((n) => {

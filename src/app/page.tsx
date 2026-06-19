@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import InstallButton from "@/components/InstallButton";
 import { isClerkConfigured } from "@/lib/clerk-config";
+import { CameraIcon, EyeIcon, HashIcon, CommentIcon } from "@/components/icons";
 
 function Logo() {
   return (
@@ -16,11 +17,11 @@ function Logo() {
 }
 
 const FEATURES = [
-  ["📸", "Snap & upload", "Capture invoices/bills from your phone in seconds."],
-  ["👀", "Manager visibility", "Your ABM/ZBM sees your submissions automatically."],
-  ["🧮", "Accurate counts", "Track individual and total counts on every invoice."],
-  ["💬", "Add context", "Drop comments so nothing gets lost in translation."],
-];
+  [CameraIcon, "Snap & upload", "Capture invoices/bills from your phone in seconds."],
+  [EyeIcon, "Manager visibility", "Your ABM/ZBM sees your submissions automatically."],
+  [HashIcon, "Accurate counts", "Track individual and total counts on every invoice."],
+  [CommentIcon, "Add context", "Drop comments so nothing gets lost in translation."],
+] as const;
 
 export default async function Home() {
   const configured = isClerkConfigured();
@@ -46,9 +47,11 @@ export default async function Home() {
         </div>
 
         <div className="mt-6 space-y-3">
-          {FEATURES.map(([icon, title, desc]) => (
-            <div key={title} className="flex gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
-              <span className="text-2xl">{icon}</span>
+          {FEATURES.map(([Icon, title, desc]) => (
+            <div key={title} className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+                <Icon size={20} />
+              </span>
               <div>
                 <p className="font-semibold text-slate-800">{title}</p>
                 <p className="text-sm text-slate-500">{desc}</p>
@@ -61,7 +64,7 @@ export default async function Home() {
       <div className="mt-8">
         {!configured ? (
           <div className="rounded-2xl bg-amber-50 p-4 text-sm text-amber-800 ring-1 ring-amber-200">
-            <p className="font-semibold">⚙️ Setup needed</p>
+            <p className="font-semibold">Setup needed</p>
             <p className="mt-1">
               Add your Clerk keys to <code className="rounded bg-amber-100 px-1">.env</code> and restart
               to enable login. See <code className="rounded bg-amber-100 px-1">README.md</code>.
