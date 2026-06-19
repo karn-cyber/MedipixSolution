@@ -52,16 +52,6 @@ export default async function InvoiceDetail({ params }: { params: Promise<{ id: 
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-100">
-          <p className="text-2xl font-bold text-slate-900">{invoice.individualCount}</p>
-          <p className="text-xs font-medium text-slate-500">Individual count</p>
-        </div>
-        <div className="rounded-2xl bg-brand-50 p-4 ring-1 ring-brand-100">
-          <p className="text-2xl font-bold text-brand-800">{invoice.totalCount}</p>
-          <p className="text-xs font-medium text-brand-700">Total count</p>
-        </div>
-      </div>
 
       <div className="space-y-3">
         <h2 className="font-semibold text-slate-800">Comments ({invoice.comments.length})</h2>

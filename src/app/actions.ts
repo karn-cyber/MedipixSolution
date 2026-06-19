@@ -35,8 +35,6 @@ export async function uploadInvoice(formData: FormData): Promise<void> {
   if (!(file instanceof File) || file.size === 0) throw new Error("An invoice photo is required");
 
   const title = String(formData.get("title") ?? "").trim() || undefined;
-  const individualCount = Math.max(0, Number(formData.get("individualCount") ?? 1) || 0);
-  const totalCount = Math.max(0, Number(formData.get("totalCount") ?? 1) || 0);
   const initialComment = String(formData.get("comment") ?? "").trim();
   const mime = file.type || "image/jpeg";
 
@@ -49,8 +47,6 @@ export async function uploadInvoice(formData: FormData): Promise<void> {
     uploaderName: me.name ?? "Unknown",
     imageMime: mime,
     title,
-    individualCount,
-    totalCount,
     comments,
   });
 

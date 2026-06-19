@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { uploadInvoice } from "@/app/actions";
-import { CameraIcon, ImageIcon, HashIcon, CommentIcon } from "@/components/icons";
+import { CameraIcon, ImageIcon, CommentIcon } from "@/components/icons";
 
 // Downscale a captured photo to keep uploads light for mobile data.
 async function compress(file: File, maxDim = 1600, quality = 0.8): Promise<File> {
@@ -118,35 +118,6 @@ export default function UploadForm() {
           placeholder="e.g. Apollo Pharmacy — March"
           className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
         />
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-slate-700">
-            <HashIcon size={15} /> Individual count
-          </label>
-          <input
-            name="individualCount"
-            type="number"
-            min={0}
-            defaultValue={1}
-            inputMode="numeric"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
-          />
-        </div>
-        <div>
-          <label className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-slate-700">
-            <HashIcon size={15} /> Total count
-          </label>
-          <input
-            name="totalCount"
-            type="number"
-            min={0}
-            defaultValue={1}
-            inputMode="numeric"
-            className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
-          />
-        </div>
       </div>
 
       <div>

@@ -129,3 +129,16 @@ export const CheckIcon = (p: IconProps) => (
     <path d="m5 13 4 4L19 7" />
   </Base>
 );
+
+export const TableIcon = (p: IconProps) => (
+  <Base {...p}>
+    <rect x="3" y="4" width="18" height="16" rx="2" />
+    <path d="M3 10h18M3 15h18M11 10v10" />
+  </Base>
+);
+
+export const ChevronRightIcon = (p: IconProps) => (
+  <Base {...p}>
+    <path d="m9 6 6 6-6 6" />
+  </Base>
+);

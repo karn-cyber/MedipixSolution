@@ -55,19 +55,13 @@ export default async function InvoicesPage() {
                     {inv.uploaderName} ·{" "}
                     {new Date(inv.createdAt).toLocaleDateString(undefined, { day: "numeric", month: "short" })}
                   </p>
-                  <div className="mt-1.5 flex flex-wrap gap-1.5">
-                    <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-800">
-                      Individual {inv.individualCount}
-                    </span>
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-                      Total {inv.totalCount}
-                    </span>
-                    {inv.comments.length > 0 && (
+                  {inv.comments.length > 0 && (
+                    <div className="mt-1.5">
                       <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
                         <CommentIcon size={12} /> {inv.comments.length}
                       </span>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </Link>
             </li>

@@ -20,6 +20,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     { href: "/invoices", label: "Invoices", key: "invoices" as const },
     { href: "/invoices/new", label: "Upload", key: "upload" as const },
     ...(isManager(me.role) ? [{ href: "/team", label: "Team", key: "team" as const }] : []),
+    ...(isManager(me.role) || isAdmin(me.role)
+      ? [{ href: "/data", label: "Data", key: "data" as const }]
+      : []),
     ...(isAdmin(me.role) ? [{ href: "/admin", label: "Admin", key: "admin" as const }] : []),
     { href: "/notifications", label: "Alerts", key: "alerts" as const },
   ];

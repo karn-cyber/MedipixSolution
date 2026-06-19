@@ -11,26 +11,20 @@ export default async function AdminPage() {
   if (!isAdmin(me.role)) redirect("/dashboard");
 
   await dbConnect();
-  const [invoiceCount, userCount, agg, byRole, recent, users] = await Promise.all([
+  const [invoiceCount, userCount, byRole, recent, users] = await Promise.all([
     Invoice.countDocuments(),
     User.countDocuments(),
-    Invoice.aggregate([
-      { $group: { _id: null, individual: { $sum: "$individualCount" }, total: { $sum: "$totalCount" } } },
-    ]),
     User.aggregate([{ $group: { _id: "$role", n: { $sum: 1 } } }]),
     Invoice.find().sort({ createdAt: -1 }).limit(8).lean(),
     User.find().sort({ createdAt: -1 }).limit(50).lean(),
   ]);
 
-  const sums = agg[0] ?? { individual: 0, total: 0 };
   const roleCounts: Record<string, number> = {};
   byRole.forEach((r) => (roleCounts[r._id ?? "—"] = r.n));
 
   const stats = [
-    { label: "Invoices", value: invoiceCount },
+    { label: "Total invoices", value: invoiceCount },
     { label: "Users", value: userCount },
-    { label: "Individual count", value: sums.individual },
-    { label: "Total count", value: sums.total },
   ];
 
   return (
@@ -68,9 +62,7 @@ export default async function AdminPage() {
                 <img src={`/api/invoices/${inv._id}/image`} alt="" loading="lazy" decoding="async" className="h-12 w-12 rounded-lg bg-slate-100 object-cover ring-1 ring-slate-200" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-slate-800">{inv.title || "Invoice"}</p>
-                  <p className="text-xs text-slate-500">
-                    {inv.uploaderName} · ind {inv.individualCount} · total {inv.totalCount}
-                  </p>
+                  <p className="text-xs text-slate-500">{inv.uploaderName}</p>
                 </div>
               </Link>
             </li>

@@ -4,7 +4,7 @@ import { dbConnect } from "@/lib/db";
 import { Invoice, User } from "@/lib/models";
 import { visibleUploaderIds } from "@/lib/visibility";
 import { isManager, isAdmin, ROLE_LABELS } from "@/lib/roles";
-import { PlusCircleIcon, ReceiptIcon, UsersIcon, ShieldIcon } from "@/components/icons";
+import { PlusCircleIcon, ReceiptIcon, UsersIcon, ShieldIcon, TableIcon } from "@/components/icons";
 
 export default async function Dashboard() {
   const me = await requireUser();
@@ -13,22 +13,14 @@ export default async function Dashboard() {
   const ids = await visibleUploaderIds(me);
   const filter = ids ? { uploaderId: { $in: ids } } : {};
 
-  const [invoiceCount, agg, teamCount, recent] = await Promise.all([
+  const [invoiceCount, teamCount, recent] = await Promise.all([
     Invoice.countDocuments(filter),
-    Invoice.aggregate([
-      { $match: filter },
-      { $group: { _id: null, individual: { $sum: "$individualCount" }, total: { $sum: "$totalCount" } } },
-    ]),
     isManager(me.role) ? User.countDocuments({ managerId: me._id }) : Promise.resolve(0),
     Invoice.find(filter).sort({ createdAt: -1 }).limit(4).lean(),
   ]);
 
-  const sums = agg[0] ?? { individual: 0, total: 0 };
-
   const stats = [
-    { label: isAdmin(me.role) ? "All invoices" : "Visible invoices", value: invoiceCount },
-    { label: "Individual count", value: sums.individual },
-    { label: "Total count", value: sums.total },
+    { label: "Total invoices", value: invoiceCount },
     ...(isManager(me.role) ? [{ label: "Team members", value: teamCount }] : []),
   ];
 
@@ -58,6 +50,11 @@ export default async function Dashboard() {
         {isManager(me.role) && (
           <Link href="/team" className="flex items-center gap-2 rounded-2xl bg-white p-4 font-semibold text-slate-800 ring-1 ring-slate-200">
             <UsersIcon size={20} className="text-brand-700" /> Manage team
+          </Link>
+        )}
+        {(isManager(me.role) || isAdmin(me.role)) && (
+          <Link href="/data" className="flex items-center gap-2 rounded-2xl bg-white p-4 font-semibold text-slate-800 ring-1 ring-slate-200">
+            <TableIcon size={20} className="text-brand-700" /> Data
           </Link>
         )}
         {isAdmin(me.role) && (
@@ -94,7 +91,7 @@ export default async function Dashboard() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium text-slate-800">{inv.title || "Invoice"}</p>
                     <p className="text-xs text-slate-500">
-                      by {inv.uploaderName} · total {inv.totalCount}
+                      by {inv.uploaderName}
                     </p>
                   </div>
                 </Link>

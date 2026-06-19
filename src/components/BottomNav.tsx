@@ -9,15 +9,17 @@ import {
   UsersIcon,
   ShieldIcon,
   BellIcon,
+  TableIcon,
 } from "@/components/icons";
 
-export type NavKey = "home" | "invoices" | "upload" | "team" | "admin" | "alerts";
+export type NavKey = "home" | "invoices" | "upload" | "team" | "data" | "admin" | "alerts";
 
 const ICONS: Record<NavKey, (p: { size?: number }) => React.ReactElement> = {
   home: HomeIcon,
   invoices: ReceiptIcon,
   upload: PlusCircleIcon,
   team: UsersIcon,
+  data: TableIcon,
   admin: ShieldIcon,
   alerts: BellIcon,
 };

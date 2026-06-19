@@ -47,8 +47,6 @@ export interface IInvoice {
   imagePath: string;
   imageMime: string;
   title?: string;
-  individualCount: number;
-  totalCount: number;
   comments: {
     _id: Types.ObjectId;
     authorId: Types.ObjectId;
@@ -69,8 +67,6 @@ const InvoiceSchema = new Schema<IInvoice>(
     imagePath: { type: String },
     imageMime: { type: String, default: "image/jpeg" },
     title: { type: String },
-    individualCount: { type: Number, default: 1, min: 0 },
-    totalCount: { type: Number, default: 1, min: 0 },
     comments: { type: [CommentSchema], default: [] },
   },
   { timestamps: true },
