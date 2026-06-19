@@ -48,7 +48,7 @@ export default function TeamManager({
             name="email"
             type="email"
             required
-            placeholder="member@medipix.com"
+            placeholder="employee@gmail.com"
             className="min-w-0 flex-1 rounded-xl border border-slate-300 px-3 py-2.5 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
           />
           <button

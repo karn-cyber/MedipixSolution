@@ -5,11 +5,19 @@ import { CheckIcon, DownloadIcon } from "@/components/icons";
 
 type BIPEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
 
+declare global {
+  interface Window {
+    __bipEvent?: BIPEvent;
+  }
+}
+
+type Platform = "android" | "ios" | "desktop";
+
 export default function InstallButton() {
   const [deferred, setDeferred] = useState<BIPEvent | null>(null);
   const [installed, setInstalled] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
-  const [showIOS, setShowIOS] = useState(false);
+  const [platform, setPlatform] = useState<Platform>("android");
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     const standalone =
@@ -19,16 +27,27 @@ export default function InstallButton() {
     setInstalled(standalone);
 
     const ua = window.navigator.userAgent.toLowerCase();
-    setIsIOS(/iphone|ipad|ipod/.test(ua) && !/crios|fxios/.test(ua));
+    if (/iphone|ipad|ipod/.test(ua)) setPlatform("ios");
+    else if (/android/.test(ua)) setPlatform("android");
+    else setPlatform("desktop");
 
+    // Pick up an event captured before this component mounted.
+    if (window.__bipEvent) setDeferred(window.__bipEvent);
+
+    const onReady = () => window.__bipEvent && setDeferred(window.__bipEvent);
     const onBIP = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BIPEvent);
     };
-    const onInstalled = () => setInstalled(true);
+    const onInstalled = () => {
+      setInstalled(true);
+      window.__bipEvent = undefined;
+    };
+    window.addEventListener("bip-ready", onReady);
     window.addEventListener("beforeinstallprompt", onBIP);
     window.addEventListener("appinstalled", onInstalled);
     return () => {
+      window.removeEventListener("bip-ready", onReady);
       window.removeEventListener("beforeinstallprompt", onBIP);
       window.removeEventListener("appinstalled", onInstalled);
     };
@@ -45,12 +64,22 @@ export default function InstallButton() {
   async function install() {
     if (deferred) {
       await deferred.prompt();
-      await deferred.userChoice;
+      const choice = await deferred.userChoice;
       setDeferred(null);
-    } else if (isIOS) {
-      setShowIOS(true);
+      window.__bipEvent = undefined;
+      if (choice.outcome !== "accepted") setShowHelp(true);
+    } else {
+      // No native prompt available — guide the user through manual install.
+      setShowHelp(true);
     }
   }
+
+  const help =
+    platform === "ios"
+      ? "On iPhone (Safari): tap the Share button, then “Add to Home Screen”."
+      : platform === "android"
+        ? "In Chrome: tap the ⋮ menu (top-right), then “Add to Home screen” / “Install app”."
+        : "In Chrome/Edge: click the install icon in the address bar, or the ⋮ menu → “Install Medipix”.";
 
   return (
     <div className="space-y-3">
@@ -62,15 +91,14 @@ export default function InstallButton() {
         Download Medipix
       </button>
 
-      {showIOS && (
+      {showHelp && (
         <div className="rounded-xl bg-white p-4 text-sm text-slate-600 shadow ring-1 ring-slate-200">
-          On iPhone: tap the <span className="font-semibold">Share</span> button in Safari, then{" "}
-          <span className="font-semibold">“Add to Home Screen.”</span>
+          {help}
         </div>
       )}
-      {!deferred && !isIOS && (
+      {!deferred && !showHelp && (
         <p className="text-center text-xs text-slate-400">
-          Open in Chrome/Edge on Android, or Safari on iPhone, to install to your home screen.
+          Tap to install. On iPhone use Safari; on Android use Chrome.
         </p>
       )}
     </div>
