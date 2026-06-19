@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { currentUser } from "@clerk/nextjs/server";
 import { dbConnect } from "./db";
 import { User, type IUser } from "./models";
@@ -6,8 +7,11 @@ import { User, type IUser } from "./models";
  * Returns the Mongo User document for the signed-in Clerk user, creating a
  * stub on first sight. Emails listed in ADMIN_EMAILS are provisioned as ADMIN.
  * Returns null when nobody is signed in.
+ *
+ * Wrapped in React `cache()` so the layout and page in the same request share a
+ * single Clerk + Mongo lookup instead of querying twice per navigation.
  */
-export async function getCurrentUser(): Promise<IUser | null> {
+export const getCurrentUser = cache(async (): Promise<IUser | null> => {
   const clerkUser = await currentUser();
   if (!clerkUser) return null;
 
@@ -38,7 +42,7 @@ export async function getCurrentUser(): Promise<IUser | null> {
   }
 
   return user.toObject() as IUser;
-}
+});
 
 /** Plain-object current user (safe to pass to client components). */
 export async function requireUser(): Promise<IUser> {

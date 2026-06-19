@@ -87,7 +87,9 @@ export default async function Dashboard() {
                   <img
                     src={`/api/invoices/${inv._id}/image`}
                     alt=""
-                    className="h-12 w-12 rounded-lg object-cover ring-1 ring-slate-200"
+                    loading="lazy"
+                    decoding="async"
+                    className="h-12 w-12 rounded-lg bg-slate-100 object-cover ring-1 ring-slate-200"
                   />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium text-slate-800">{inv.title || "Invoice"}</p>

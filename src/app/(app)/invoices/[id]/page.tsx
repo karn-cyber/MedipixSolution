@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { dbConnect } from "@/lib/db";
 import { Invoice, User } from "@/lib/models";
 import CommentForm from "@/components/CommentForm";
+import DeleteInvoiceButton from "@/components/DeleteInvoiceButton";
 import { ArrowLeftIcon } from "@/components/icons";
 
 export default async function InvoiceDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -23,6 +24,8 @@ export default async function InvoiceDetail({ params }: { params: Promise<{ id: 
     String(invoice.uploaderId) === String(me._id) ||
     (uploader?.managerId && String(uploader.managerId) === String(me._id));
   if (!canView) notFound();
+
+  const canDelete = me.role === "ADMIN" || String(invoice.uploaderId) === String(me._id);
 
   return (
     <div className="space-y-5">
@@ -84,6 +87,12 @@ export default async function InvoiceDetail({ params }: { params: Promise<{ id: 
         )}
         <CommentForm invoiceId={id} />
       </div>
+
+      {canDelete && (
+        <div className="pt-2">
+          <DeleteInvoiceButton invoiceId={id} />
+        </div>
+      )}
     </div>
   );
 }

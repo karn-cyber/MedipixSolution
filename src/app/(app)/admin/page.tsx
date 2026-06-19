@@ -65,7 +65,7 @@ export default async function AdminPage() {
           {recent.map((inv) => (
             <li key={String(inv._id)}>
               <Link href={`/invoices/${inv._id}`} className="flex gap-3 rounded-2xl bg-white p-3 ring-1 ring-slate-100">
-                <img src={`/api/invoices/${inv._id}/image`} alt="" className="h-12 w-12 rounded-lg object-cover ring-1 ring-slate-200" />
+                <img src={`/api/invoices/${inv._id}/image`} alt="" loading="lazy" decoding="async" className="h-12 w-12 rounded-lg bg-slate-100 object-cover ring-1 ring-slate-200" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-slate-800">{inv.title || "Invoice"}</p>
                   <p className="text-xs text-slate-500">

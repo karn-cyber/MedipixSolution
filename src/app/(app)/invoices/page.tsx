@@ -45,7 +45,9 @@ export default async function InvoicesPage() {
                 <img
                   src={`/api/invoices/${inv._id}/image`}
                   alt=""
-                  className="h-16 w-16 shrink-0 rounded-xl object-cover ring-1 ring-slate-200"
+                  loading="lazy"
+                  decoding="async"
+                  className="h-16 w-16 shrink-0 rounded-xl bg-slate-100 object-cover ring-1 ring-slate-200"
                 />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold text-slate-800">{inv.title || "Invoice"}</p>

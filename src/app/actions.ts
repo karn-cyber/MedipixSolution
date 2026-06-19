@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Types } from "mongoose";
 import { dbConnect } from "@/lib/db";
-import { Invoice, Notification, User } from "@/lib/models";
+import { Invoice, InvoiceImage, Notification, User } from "@/lib/models";
 import { requireUser } from "@/lib/auth";
 import { saveInvoiceImage } from "@/lib/storage";
 import { ROLES, recruitableRole, isManager, ROLE_LABELS, type Role } from "@/lib/roles";
@@ -112,6 +112,26 @@ export async function addComment(invoiceId: string, formData: FormData): Promise
 
   revalidatePath(`/invoices/${invoiceId}`);
   return { ok: true };
+}
+
+/* --------------------------- Delete ------------------------------ */
+export async function deleteInvoice(invoiceId: string): Promise<void> {
+  const me = await requireUser();
+  await dbConnect();
+
+  const invoice = await Invoice.findById(invoiceId);
+  if (!invoice) redirect("/invoices");
+
+  // Only the original uploader or an admin may delete.
+  const canDelete = me.role === "ADMIN" || invoice.uploaderId.equals(me._id);
+  if (!canDelete) throw new Error("You can't delete this invoice");
+
+  await InvoiceImage.deleteOne({ invoiceId: invoice._id });
+  await Invoice.deleteOne({ _id: invoice._id });
+
+  revalidatePath("/invoices");
+  revalidatePath("/dashboard");
+  redirect("/invoices");
 }
 
 /* ----------------------- Team management ------------------------- */
