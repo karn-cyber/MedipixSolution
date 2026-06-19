@@ -12,10 +12,29 @@ export async function dbConnect(): Promise<typeof mongoose> {
   if (!MONGODB_URI) {
     throw new Error("MONGODB_URI is not set. Add it to your .env file.");
   }
-  if (cached.conn) return cached.conn;
+  // Reuse a healthy connection; otherwise (re)connect.
+  if (cached.conn && mongoose.connection.readyState === 1) return cached.conn;
+
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, { dbName: "medipix" });
+    cached.promise = mongoose
+      .connect(MONGODB_URI, {
+        dbName: "medipix",
+        serverSelectionTimeoutMS: 10000,
+        maxPoolSize: 10,
+      })
+      .catch((err) => {
+        // Don't cache a rejected promise — let the next request retry.
+        cached.promise = null;
+        throw err;
+      });
   }
-  cached.conn = await cached.promise;
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (err) {
+    cached.promise = null;
+    cached.conn = null;
+    throw err;
+  }
   return cached.conn;
 }

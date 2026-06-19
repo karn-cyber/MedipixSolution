@@ -7,6 +7,7 @@ import { dbConnect } from "@/lib/db";
 import { Invoice, InvoiceImage, Notification, User } from "@/lib/models";
 import { requireUser } from "@/lib/auth";
 import { saveInvoiceImage } from "@/lib/storage";
+import { canViewUploader } from "@/lib/visibility";
 import { ROLES, recruitableRole, isManager, ROLE_LABELS, type Role } from "@/lib/roles";
 
 type ActionResult = { ok: boolean; error?: string };
@@ -84,12 +85,8 @@ export async function addComment(invoiceId: string, formData: FormData): Promise
   const invoice = await Invoice.findById(invoiceId);
   if (!invoice) return { ok: false, error: "Invoice not found" };
 
-  // Visibility check: uploader, uploader's manager, or admin.
-  const uploader = await User.findById(invoice.uploaderId);
-  const canView =
-    me.role === "ADMIN" ||
-    invoice.uploaderId.equals(me._id) ||
-    (uploader?.managerId && uploader.managerId.equals(me._id));
+  // Visibility check: uploader, anyone above them in the hierarchy, or admin.
+  const canView = await canViewUploader(me, invoice.uploaderId);
   if (!canView) return { ok: false, error: "Not allowed" };
 
   invoice.comments.push({
@@ -135,20 +132,19 @@ export async function deleteInvoice(invoiceId: string): Promise<void> {
 }
 
 /* ----------------------- Team management ------------------------- */
-export async function addTeamMember(formData: FormData): Promise<ActionResult> {
+export async function addTeamMember(userId: string): Promise<ActionResult> {
   const me = await requireUser();
   if (!isManager(me.role)) return { ok: false, error: "Only managers can add members" };
 
   const targetRole = recruitableRole(me.role);
   if (!targetRole) return { ok: false, error: "Your role can't recruit members" };
 
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  if (!email) return { ok: false, error: "Enter the member's email" };
+  if (!userId) return { ok: false, error: "Pick a member to add" };
 
   await dbConnect();
-  const member = await User.findOne({ email });
+  const member = await User.findById(userId).catch(() => null);
   if (!member) {
-    return { ok: false, error: "No Medipix user with that email yet. Ask them to sign up first." };
+    return { ok: false, error: "That user no longer exists" };
   }
   if (member._id.equals(me._id)) return { ok: false, error: "You can't add yourself" };
   if (member.managerId && member.managerId.equals(me._id)) {

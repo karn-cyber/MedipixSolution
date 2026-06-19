@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { isClerkConfigured } from "@/lib/clerk-config";
@@ -32,17 +33,11 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const body = (
     <html lang="en" className="h-full antialiased">
-      <head>
-        {/* Capture Chrome's install prompt as early as possible so the button
-            can use it even if the event fired before React hydrated. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__bipEvent=e;window.dispatchEvent(new Event('bip-ready'));});",
-          }}
-        />
-      </head>
       <body className="min-h-full bg-slate-50 text-slate-900">
+        {/* Capture Chrome's install prompt early so the install button can use it. */}
+        <Script id="bip-capture" strategy="beforeInteractive">
+          {`window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__bipEvent=e;window.dispatchEvent(new Event('bip-ready'));});`}
+        </Script>
         <RegisterSW />
         {children}
       </body>

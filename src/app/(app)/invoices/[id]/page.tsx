@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { isValidObjectId } from "mongoose";
 import { requireUser } from "@/lib/auth";
 import { dbConnect } from "@/lib/db";
-import { Invoice, User } from "@/lib/models";
+import { Invoice } from "@/lib/models";
+import { canViewUploader } from "@/lib/visibility";
 import CommentForm from "@/components/CommentForm";
 import DeleteInvoiceButton from "@/components/DeleteInvoiceButton";
 import { ArrowLeftIcon } from "@/components/icons";
@@ -18,11 +19,7 @@ export default async function InvoiceDetail({ params }: { params: Promise<{ id: 
   const invoice = await Invoice.findById(id).lean();
   if (!invoice) notFound();
 
-  const uploader = await User.findById(invoice.uploaderId).lean();
-  const canView =
-    me.role === "ADMIN" ||
-    String(invoice.uploaderId) === String(me._id) ||
-    (uploader?.managerId && String(uploader.managerId) === String(me._id));
+  const canView = await canViewUploader(me, invoice.uploaderId);
   if (!canView) notFound();
 
   const canDelete = me.role === "ADMIN" || String(invoice.uploaderId) === String(me._id);

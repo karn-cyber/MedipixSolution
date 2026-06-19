@@ -21,8 +21,12 @@ The role doubles as the employee's position in the field hierarchy.
 
 **Visibility rule (single source of truth):** an invoice is visible to
 1. its **uploader**,
-2. the uploader's **direct manager**, and
+2. **everyone above the uploader in the hierarchy** (direct manager and up — so a TM's
+   invoice is seen by their ABM *and* that ABM's ZBM), and
 3. any **admin**.
+
+Equivalently, a manager sees their entire downward subtree. When an ABM adds a TM, that TM
+(and their invoices) automatically becomes visible to the ABM's ZBM — no extra step.
 
 This is enforced in three places that must stay in sync: list queries
 (`lib/visibility.ts`), the comment action, and the image-serving route.

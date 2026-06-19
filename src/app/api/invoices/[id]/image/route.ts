@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/db";
-import { Invoice, User } from "@/lib/models";
+import { Invoice } from "@/lib/models";
 import { getCurrentUser } from "@/lib/auth";
+import { canViewUploader } from "@/lib/visibility";
 import { readInvoiceImage } from "@/lib/storage";
 
 // Serves an invoice image only to users allowed to see that invoice.
@@ -14,11 +15,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
   const invoice = await Invoice.findById(id);
   if (!invoice) return new NextResponse("Not found", { status: 404 });
 
-  const uploader = await User.findById(invoice.uploaderId);
-  const canView =
-    me.role === "ADMIN" ||
-    invoice.uploaderId.equals(me._id) ||
-    (uploader?.managerId && uploader.managerId.equals(me._id));
+  const canView = await canViewUploader(me, invoice.uploaderId);
   if (!canView) return new NextResponse("Forbidden", { status: 403 });
 
   const image = await readInvoiceImage(invoice._id);
