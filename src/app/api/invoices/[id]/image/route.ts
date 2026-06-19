@@ -21,15 +21,13 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
     (uploader?.managerId && uploader.managerId.equals(me._id));
   if (!canView) return new NextResponse("Forbidden", { status: 403 });
 
-  try {
-    const buf = await readInvoiceImage(invoice.imagePath);
-    return new NextResponse(new Uint8Array(buf), {
-      headers: {
-        "Content-Type": invoice.imageMime || "image/jpeg",
-        "Cache-Control": "private, max-age=3600",
-      },
-    });
-  } catch {
-    return new NextResponse("Image unavailable", { status: 404 });
-  }
+  const image = await readInvoiceImage(invoice._id);
+  if (!image) return new NextResponse("Image unavailable", { status: 404 });
+
+  return new NextResponse(new Uint8Array(image.data), {
+    headers: {
+      "Content-Type": image.mime || invoice.imageMime || "image/jpeg",
+      "Cache-Control": "private, max-age=3600",
+    },
+  });
 }

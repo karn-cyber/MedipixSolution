@@ -37,8 +37,7 @@ export async function uploadInvoice(formData: FormData): Promise<void> {
   const individualCount = Math.max(0, Number(formData.get("individualCount") ?? 1) || 0);
   const totalCount = Math.max(0, Number(formData.get("totalCount") ?? 1) || 0);
   const initialComment = String(formData.get("comment") ?? "").trim();
-
-  const { path, mime } = await saveInvoiceImage(file);
+  const mime = file.type || "image/jpeg";
 
   const comments = initialComment
     ? [{ authorId: me._id, authorName: me.name ?? "Unknown", body: initialComment, createdAt: new Date() }]
@@ -47,13 +46,20 @@ export async function uploadInvoice(formData: FormData): Promise<void> {
   const invoice = await Invoice.create({
     uploaderId: me._id,
     uploaderName: me.name ?? "Unknown",
-    imagePath: path,
     imageMime: mime,
     title,
     individualCount,
     totalCount,
     comments,
   });
+
+  // Persist the photo bytes to MongoDB; roll back the invoice if it fails.
+  try {
+    await saveInvoiceImage(invoice._id, file);
+  } catch (e) {
+    await Invoice.deleteOne({ _id: invoice._id });
+    throw e;
+  }
 
   // Notify the uploader's manager that a new invoice is visible to them.
   if (me.managerId) {

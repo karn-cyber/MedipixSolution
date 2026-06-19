@@ -41,8 +41,9 @@ Serve over **HTTPS** (PWA installs require it — `localhost` is exempt for test
 Vercel or run behind an HTTPS tunnel, open the URL on the phone, and tap **Download Medipix**
 (Android) or **Share → Add to Home Screen** (iPhone).
 
-> Note: invoice images are stored on the server's local disk (`/data/uploads`). For a
-> serverless deploy (e.g. Vercel) switch `src/lib/storage.ts` to object storage (S3/GCS/Blob).
+> Note: invoice images are stored **in MongoDB** (the `InvoiceImage` collection), so uploads
+> work on read-only / serverless hosts (Vercel, etc.). For very high volume, switch
+> `src/lib/storage.ts` to object storage (S3/GCS/Blob) or GridFS.
 
 ## Project layout
 ```

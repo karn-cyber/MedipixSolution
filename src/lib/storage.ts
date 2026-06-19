@@ -1,29 +1,28 @@
-import { mkdir, writeFile, readFile } from "node:fs/promises";
-import { join, extname } from "node:path";
-import { randomUUID } from "node:crypto";
+import { Types } from "mongoose";
+import { dbConnect } from "./db";
+import { InvoiceImage } from "./models";
 
-// Invoice images live outside /public so they can be served access-controlled.
-const UPLOAD_DIR = join(process.cwd(), "data", "uploads");
+// Invoice images are stored in MongoDB (the InvoiceImage collection) rather than
+// on the local filesystem, so uploads work on read-only / serverless hosts.
 
-const MIME_EXT: Record<string, string> = {
-  "image/jpeg": ".jpg",
-  "image/png": ".png",
-  "image/webp": ".webp",
-  "image/heic": ".heic",
-};
-
-export async function saveInvoiceImage(file: File): Promise<{ path: string; mime: string }> {
-  await mkdir(UPLOAD_DIR, { recursive: true });
+export async function saveInvoiceImage(
+  invoiceId: Types.ObjectId,
+  file: File,
+): Promise<{ mime: string }> {
+  await dbConnect();
   const buf = Buffer.from(await file.arrayBuffer());
   const mime = file.type || "image/jpeg";
-  const ext = MIME_EXT[mime] ?? extname(file.name) ?? ".jpg";
-  const name = `${randomUUID()}${ext}`;
-  await writeFile(join(UPLOAD_DIR, name), buf);
-  return { path: name, mime };
+  await InvoiceImage.create({ invoiceId, data: buf, mime });
+  return { mime };
 }
 
-export async function readInvoiceImage(path: string): Promise<Buffer> {
-  // Guard against path traversal — only a bare filename is valid.
-  if (path.includes("/") || path.includes("..")) throw new Error("Invalid path");
-  return readFile(join(UPLOAD_DIR, path));
+export async function readInvoiceImage(
+  invoiceId: Types.ObjectId | string,
+): Promise<{ data: Buffer; mime: string } | null> {
+  await dbConnect();
+  // No .lean(): Mongoose hydrates the Buffer field to a real Node Buffer
+  // (a lean read returns a raw BSON Binary instead).
+  const doc = await InvoiceImage.findOne({ invoiceId });
+  if (!doc) return null;
+  return { data: Buffer.from(doc.data), mime: doc.mime };
 }

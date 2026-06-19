@@ -64,7 +64,9 @@ const InvoiceSchema = new Schema<IInvoice>(
   {
     uploaderId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
     uploaderName: { type: String, required: true },
-    imagePath: { type: String, required: true },
+    // Image bytes live in the separate InvoiceImage collection (keyed by this
+    // invoice's _id) so list queries stay light and it works on read-only hosts.
+    imagePath: { type: String },
     imageMime: { type: String, default: "image/jpeg" },
     title: { type: String },
     individualCount: { type: Number, default: 1, min: 0 },
@@ -94,9 +96,32 @@ const NotificationSchema = new Schema<INotification>(
   { timestamps: { createdAt: true, updatedAt: false } },
 );
 
+/* ------------------------ InvoiceImage -------------------------- */
+// Stores the actual photo bytes in MongoDB. Kept in its own collection so the
+// large Buffer is never pulled into invoice list/detail queries.
+export interface IInvoiceImage {
+  _id: Types.ObjectId;
+  invoiceId: Types.ObjectId;
+  data: Buffer;
+  mime: string;
+  createdAt: Date;
+}
+
+const InvoiceImageSchema = new Schema<IInvoiceImage>(
+  {
+    invoiceId: { type: Schema.Types.ObjectId, ref: "Invoice", required: true, unique: true, index: true },
+    data: { type: Buffer, required: true },
+    mime: { type: String, default: "image/jpeg" },
+  },
+  { timestamps: { createdAt: true, updatedAt: false } },
+);
+
 export const User = (models.User as mongoose.Model<IUser>) || model<IUser>("User", UserSchema);
 export const Invoice =
   (models.Invoice as mongoose.Model<IInvoice>) || model<IInvoice>("Invoice", InvoiceSchema);
 export const Notification =
   (models.Notification as mongoose.Model<INotification>) ||
   model<INotification>("Notification", NotificationSchema);
+export const InvoiceImage =
+  (models.InvoiceImage as mongoose.Model<IInvoiceImage>) ||
+  model<IInvoiceImage>("InvoiceImage", InvoiceImageSchema);
