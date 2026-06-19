@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import InstallButton from "@/components/InstallButton";
 import { isClerkConfigured } from "@/lib/clerk-config";
 
@@ -22,7 +22,10 @@ const FEATURES = [
   ["💬", "Add context", "Drop comments so nothing gets lost in translation."],
 ];
 
-export default function Home() {
+export default async function Home() {
+  const configured = isClerkConfigured();
+  const signedIn = configured ? Boolean((await auth()).userId) : false;
+
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col px-6 py-8">
       <Logo />
@@ -56,7 +59,7 @@ export default function Home() {
       </div>
 
       <div className="mt-8">
-        {!isClerkConfigured() ? (
+        {!configured ? (
           <div className="rounded-2xl bg-amber-50 p-4 text-sm text-amber-800 ring-1 ring-amber-200">
             <p className="font-semibold">⚙️ Setup needed</p>
             <p className="mt-1">
@@ -64,30 +67,27 @@ export default function Home() {
               to enable login. See <code className="rounded bg-amber-100 px-1">README.md</code>.
             </p>
           </div>
+        ) : signedIn ? (
+          <Link
+            href="/dashboard"
+            className="flex w-full items-center justify-center rounded-2xl bg-slate-900 px-5 py-4 font-semibold text-white"
+          >
+            Open dashboard →
+          </Link>
         ) : (
           <>
-            <SignedIn>
-              <Link
-                href="/dashboard"
-                className="flex w-full items-center justify-center rounded-2xl bg-slate-900 px-5 py-4 font-semibold text-white"
-              >
-                Open dashboard →
+            <Link
+              href="/sign-in"
+              className="flex w-full items-center justify-center rounded-2xl bg-slate-900 px-5 py-4 font-semibold text-white"
+            >
+              Sign in to continue
+            </Link>
+            <p className="mt-3 text-center text-sm text-slate-500">
+              New here?{" "}
+              <Link href="/sign-up" className="font-semibold text-brand-700">
+                Create an account
               </Link>
-            </SignedIn>
-            <SignedOut>
-              <Link
-                href="/sign-in"
-                className="flex w-full items-center justify-center rounded-2xl bg-slate-900 px-5 py-4 font-semibold text-white"
-              >
-                Sign in to continue
-              </Link>
-              <p className="mt-3 text-center text-sm text-slate-500">
-                New here?{" "}
-                <Link href="/sign-up" className="font-semibold text-brand-700">
-                  Create an account
-                </Link>
-              </p>
-            </SignedOut>
+            </p>
           </>
         )}
       </div>

@@ -34,7 +34,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <p className="text-[11px] text-brand-700">{me.role ? ROLE_LABELS[me.role] : ""}</p>
           </div>
         </Link>
-        <UserButton afterSignOutUrl="/" />
+        <UserButton />
       </header>
 
       <main className="flex-1 px-4 py-4">{children}</main>
